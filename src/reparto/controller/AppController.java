@@ -159,12 +159,16 @@ public class AppController {
         for (int i=0;i<listaclientes.size();i++){
              if (listaclientes.get(i).getId()==clientemodificado.getId()){
                 System.out.println("Para modificar un cliente, es necesario modificar su nombre, dirección, tlf movil y mail.");
+                System.out.println("Nombre actual: "+listaclientes.get(i).getNombre() );
                 System.out.println("Introduzca el nuevo nombre:");
                 String nombre = UIUtilities.getString();
+                System.out.println("Dirección actual: "+listaclientes.get(i).getDireccion());
                 System.out.println("Introduzca la nueva dirección:");
                 String direccion = UIUtilities.getString();
+                System.out.println("Movil actual: "+listaclientes.get(i).getMovil());
                 System.out.println("Introduzca el movil nuevo:");
                 double movil = UIUtilities.getDouble();
+                System.out.println("Mail actual: "+listaclientes.get(i).getMail());
                 System.out.println("Introduzca el nuevo mail:");
                 String mail = UIUtilities.getString();
                 System.out.println("Modificando cliente...");
@@ -191,9 +195,11 @@ public class AppController {
         aux.setId(c);
         for (int i=0;i<listarp.size();i++){           
             if (listarp.get(i).getId()==aux.getId()){
-                System.out.println("Para registrar un repartidor, es necesario añadir su nombre y turno.");
+                System.out.println("Para editar un repartidor, es necesario añadir su nombre y turno.");
+                System.out.println("Nombre actual: "+listarp.get(i).getNombre() );
                 System.out.println("Introduzca el nuevo nombre:");
                 String nombre = UIUtilities.getString();
+                System.out.println("Turno actual: "+listarp.get(i).getTurno());
                 System.out.println("Introduzca el nuevo turno:");
                 String turno = UIUtilities.getString(); 
                 System.out.println("Modificando cliente..."); 
@@ -216,12 +222,16 @@ public class AppController {
         for (int i=0;i<listapr.size();i++){           
             if (listapr.get(i).getId()==aux.getId()){
                 System.out.println("Para modificar un producto, es necesario modificar su código, nombre, descripción y precio.");
+                System.out.println("Código actual: "+listapr.get(i).getCodigo());
                 System.out.println("Introduzca el nuevo código:");
                 int codigo = UIUtilities.getInt();
+                System.out.println("Nombre actual: "+listapr.get(i).getNombre());
                 System.out.println("Introduzca el nuevo nombre:");
                 String nombre = UIUtilities.getString();
+                System.out.println("Descripción actual: "+listapr.get(i).getDescripcion());
                 System.out.println("Introduzca la nueva descripción:");
                 String descripcion = UIUtilities.getString();
+                System.out.println("Precio actual: "+listapr.get(i).getPrecio());
                 System.out.println("Introduzca el precio actualizado:");
                 double precio = UIUtilities.getDouble();
                 System.out.println("Actualizando Producto...");
@@ -255,7 +265,7 @@ public class AppController {
                 int idc;
                 listarCliente();
                 List<Cliente> listaclientes=cdao.load();
-                
+                System.out.println("Cliente actual: "+listap.get(i).getIdCliente());
                 System.out.println("Seleccione el id del cliente que realiza el pedido");
                 idc=seleccionarInt();
                 for (int ic=0;ic<listaclientes.size();ic++){
@@ -264,12 +274,13 @@ public class AppController {
                            int idr;
                            List<Repartidor> listarepartidores=rdao.load();
                            listarRepartidor();
-                            System.out.println("Seleccione el id del repartidor que se encargará del pedido");
-                            idr=seleccionarInt();
+                           System.out.println("Repartidor actual: "+listap.get(i).getIdRepartidor());
+                           System.out.println("Seleccione el id del repartidor que se encargará del pedido");
+                           idr=seleccionarInt();
                            for (int ir=0;ir<listarepartidores.size();ir++){
                                 if (listarepartidores.get(ir).getId()==idr){
                                 aux.setIdRepartidor(idr);
-                                List<Producto> productos=rellenarPedido();
+                                List<Producto> productos=rellenarPedido(listap.get(i).getProductos());
                                 aux.setProductos(productos);
                                 pdao.update(aux);                                
                                 
@@ -352,6 +363,54 @@ public class AppController {
         
             }
         }
+    }
+    public static List<Producto> rellenarPedido(List<Producto> producto){
+        boolean result=false;
+        List<Producto> listapr=prdao.load();
+        List<Producto> productos=new ArrayList<>();
+        System.out.println("Para rellenar el pedido de productos, escoja el producto por su id y seleccione la cantidad de artículos de un mismo producto incluidos en el pedido.");
+        
+        do{
+            System.out.println("1.Añadir productos");
+            System.out.println("2.Cesta de productos");
+            System.out.println("3.Finalizar el pedido");
+            int opcionrelleno= UIUtilities.getInt();
+            switch(opcionrelleno){
+                case 1:
+                    listarProducto();
+                    System.out.println("Para rellenar el pedido de productos, escoja el producto por su id y seleccione la cantidad de artículos de un mismo producto incluidos en el pedido.");
+                    int idp=UIUtilities.getInt();
+                    
+                    for (int i=0;i<listapr.size();i++){           
+                        if (listapr.get(i).getId()==idp){
+                            System.out.println("¿Cuantas unidades de dicho artículo desea?");
+                            int pc=UIUtilities.getInt();
+                            Producto ppedido=listapr.get(i);
+                            ppedido.setCantidad(pc);
+                            ppedido.getSubtotal();
+                            System.out.println(ppedido);
+                            productos.add(ppedido);
+                            break;
+
+                        }
+                       
+                    
+                    }
+                case 2:
+                    System.out.println("Contenido del pedido anteriormente: "+ producto);
+                    System.out.println(productos);
+                    break;
+                case 3:
+                        System.out.println("Finalizando pedido");
+                        result=true;
+                    break;
+                default:
+                    System.out.println("Seleccione una opción válida");
+                    break;
+            }
+        }while(result!=true);
+    
+    return productos;
     }
     public static List<Producto> rellenarPedido(){
         boolean result=false;
